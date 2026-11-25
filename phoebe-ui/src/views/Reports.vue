@@ -9,7 +9,7 @@
         <el-form-item label="选择报告类型：">
           <el-radio-group v-model="level">
             <el-radio value="ACCOUNT">账户报告</el-radio><el-radio value="PLAN">推广计划报告</el-radio><el-radio value="UNIT">推广单元报告</el-radio>
-            <el-radio value="QA">问答报告</el-radio><el-radio value="MIDDLE_PAGE">中间页报告</el-radio>
+            <el-radio value="QA">问答报告</el-radio><el-radio value="MIDDLE_PAGE">中间页报告</el-radio><el-radio value="CPT">CPT 包词报告</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="选择流量类型：">
@@ -32,12 +32,26 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="load">查看报告</el-button>
-          <el-button type="primary" plain :disabled="level === 'MIDDLE_PAGE'" @click="exportCsv">下载报告</el-button>
+          <el-button type="primary" plain :disabled="level === 'MIDDLE_PAGE' || level === 'CPT'" @click="exportCsv">下载报告</el-button>
         </el-form-item>
       </el-form>
     </div>
 
-    <div class="pb-panel" v-if="data">
+    <div class="pb-panel" v-if="cptRows">
+      <p class="muted" style="margin-top:0">CPT 按天预付、点击不扣费，不计入上面各层级的 CPC 消费，单独统计。消费为订单实付（总价 − 退款）。</p>
+      <el-table :data="cptRows" border>
+        <el-table-column prop="name" label="包断词" min-width="120" />
+        <el-table-column prop="question" label="展示问答" min-width="200" />
+        <el-table-column prop="period" label="投放日期" min-width="180" />
+        <el-table-column prop="phase" label="状态" width="80" />
+        <el-table-column prop="impressions" label="展现" width="80" />
+        <el-table-column prop="clicks" label="点击" width="80" />
+        <el-table-column label="点击率" width="80"><template #default="{ row }">{{ row.ctr }}%</template></el-table-column>
+        <el-table-column prop="dailyPrice" label="日单价" width="90" />
+        <el-table-column prop="cost" label="实付（元）" width="100" />
+      </el-table>
+    </div>
+    <div class="pb-panel" v-if="data && level !== 'CPT'">
       <div class="kpis" v-if="data.summary">
         <div><div class="muted">展现</div><b>{{ data.summary.impressions }}</b></div>
         <div><div class="muted">点击</div><b>{{ data.summary.clicks }}</b></div>
@@ -63,10 +77,10 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import http, { download } from '../api'
-import { defaultRange } from '../labels'
+import { defaultRange, fmtDate } from '../labels'
 
 const level = ref('PLAN')
 const range = ref(defaultRange())
@@ -80,7 +94,19 @@ const splitRegion = ref(false)
 const shownSplit = ref(false)
 const params = () => ({ level: level.value, from: range.value[0], to: range.value[1], device: device.value || undefined, flow: flow.value, splitRegion: splitRegion.value })
 
+const cptRows = ref(null)
+// CPT 订单多为进行中：切到 CPT 报告时默认包含今天
+watch(level, (lv, old) => {
+  if (lv === 'CPT') range.value = [fmtDate(new Date(Date.now() - 6 * 86400000)), fmtDate(new Date())]
+  else if (old === 'CPT') range.value = defaultRange()
+})
 async function load() {
+  if (level.value === 'CPT') {
+    cptRows.value = await http.get('/cpt/report', { params: { from: range.value[0], to: range.value[1] } })
+    data.value = null
+    return
+  }
+  cptRows.value = null
   data.value = await http.get('/reports', { params: params() })
   shownSplit.value = splitRegion.value
   await nextTick()

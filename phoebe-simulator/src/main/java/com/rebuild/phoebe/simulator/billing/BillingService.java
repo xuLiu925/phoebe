@@ -47,7 +47,25 @@ public class BillingService {
         }
         BigDecimal charged = BigDecimal.ZERO;
         boolean duplicate = Boolean.TRUE.equals(imp.getClicked());
-        if (!duplicate) {
+        boolean cpt = "CPT".equals(imp.getBillingType());
+        if (!duplicate && cpt) {
+            // [C] CPT 已按天预付，点击只记录不扣费；不计入 CPC 日报（CPT 单独统计）
+            imp.setClicked(true);
+            impressionMapper.updateById(imp);
+            ClickLog log = new ClickLog();
+            log.setImpressionId(imp.getId());
+            log.setAccountId(imp.getAccountId());
+            log.setPlanId(imp.getPlanId());
+            log.setUnitId(imp.getUnitId());
+            log.setQaId(imp.getQaId());
+            log.setMiddlePageId(imp.getMiddlePageId());
+            log.setDevice(imp.getDevice());
+            log.setChannel(imp.getChannel());
+            log.setClickType(ClickLog.QA_ENTRY);
+            log.setTarget("CPT");
+            log.setChargePrice(BigDecimal.ZERO);
+            clickMapper.insert(log);
+        } else if (!duplicate) {
             charged = accountService.deduct(imp.getAccountId(), imp.getChargePrice());
             imp.setClicked(true);
             impressionMapper.updateById(imp);
@@ -75,6 +93,7 @@ public class BillingService {
         r.put("impressionId", impressionId);
         r.put("charged", charged);
         r.put("duplicateClick", duplicate);
+        r.put("billingType", cpt ? "CPT" : "CPC");
         r.put("bidPrice", imp.getEffectiveBid());
         r.put("middlePage", middlePageService.publicPreview(imp.getMiddlePageId(), imp.getDevice()));
         r.put("balance", accountService.get(imp.getAccountId()).getBalance());

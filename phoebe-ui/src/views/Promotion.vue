@@ -77,12 +77,13 @@ import UnitTab from '../components/promo/UnitTab.vue'
 import PageTab from '../components/promo/PageTab.vue'
 import QaTab from '../components/promo/QaTab.vue'
 import CreativeTab from '../components/promo/CreativeTab.vue'
+import CptTab from '../components/promo/CptTab.vue'
 
 const LEVELS = [
   { key: 'plan', text: '推广计划' }, { key: 'unit', text: '推广单元' }, { key: 'page', text: '中间页' },
-  { key: 'qa', text: '知识问答' }, { key: 'creative', text: '高级创意' }
+  { key: 'qa', text: '知识问答' }, { key: 'creative', text: '高级创意' }, { key: 'cpt', text: 'CPT 包词' }
 ]
-const TAB = { plan: PlanTab, unit: UnitTab, page: PageTab, qa: QaTab, creative: CreativeTab }
+const TAB = { plan: PlanTab, unit: UnitTab, page: PageTab, qa: QaTab, creative: CreativeTab, cpt: CptTab }
 
 const route = useRoute()
 const router = useRouter()

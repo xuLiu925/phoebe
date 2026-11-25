@@ -139,3 +139,14 @@
 | GET | `/tools/bid-suggestion?qaId=` | 出价助手 |
 | POST | `/tools/wizard` | 智能引导 `{keyword, budget, bid, maxQas}` |
 | GET | `/rules` | 当前生效的业务规则与模拟参数 |
+
+## CPT 包词
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/cpt/quote?keyword=&startDate=&endDate=` | 询价：`{keyword, days, dailyPrice, total, monthlyPv, available, conflicts:[{from, to, mine}]}`，不透露其他广告主 |
+| GET | `/cpt/orders` | 当前账户订单（含 `phase` 待开始/投放中/已结束/已取消、`question`、`impressions`、`clicks`） |
+| POST | `/cpt/orders` | 下单 `{qaId, keyword, startDate, endDate}`：一次性扣款；冲突 409、余额不足 402 |
+| POST | `/cpt/orders/{id}/cancel` | 取消：开始前全额退；投放中退明天起天数 |
+| GET | `/cpt/report?from=&to=` | CPT 报告：按订单统计时间范围内的展现、点击、实付 |
+
+模拟检索 `/simulator/search` 的返回中：广告项带 `billingType`（CPC/CPT），命中 CPT 时 `cpt` 字段给出订单信息；点击返回带 `billingType`。

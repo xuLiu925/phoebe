@@ -69,6 +69,32 @@ public class AccountService {
         return get(id);
     }
 
+    /** 退款（CPT 取消等）。 */
+    @Transactional
+    public void refund(Long id, BigDecimal amount, String reason) {
+        if (amount == null || amount.signum() <= 0) {
+            return;
+        }
+        mapper.update(null, new LambdaUpdateWrapper<Account>()
+                .eq(Account::getId, id)
+                .setSql("balance = balance + " + amount.toPlainString()));
+        opLog.log(id, "ACCOUNT", id, "REFUND", reason + " 退款 " + amount);
+    }
+
+    /** 预付扣款：余额不足直接报错，不允许扣成负数。 */
+    @Transactional
+    public void charge(Long id, BigDecimal amount, String reason) {
+        Account a = get(id);
+        if (a.getBalance().compareTo(amount) < 0) {
+            throw new BizException(com.rebuild.phoebe.common.ErrorCode.INSUFFICIENT_FUNDS,
+                    "账户余额不足：需要 " + amount + " 元，当前余额 " + a.getBalance() + " 元");
+        }
+        mapper.update(null, new LambdaUpdateWrapper<Account>()
+                .eq(Account::getId, id)
+                .setSql("balance = balance - " + amount.toPlainString()));
+        opLog.log(id, "ACCOUNT", id, "CHARGE", reason + " 扣款 " + amount);
+    }
+
     /** 扣费：最多扣到 0，返回实际扣费。 */
     @Transactional
     public BigDecimal deduct(Long id, BigDecimal amount) {

@@ -1,5 +1,5 @@
 -- =====================================================================
--- 已有 MySQL 库从 0.1.0 升级：新增投放时段、IP排除、日报渠道/地域、预算达限记录。
+-- 已有 MySQL 库从 0.1.0 升级：新增投放时段、IP排除、日报渠道/地域、预算达限记录、CPT 包词。
 -- 新库无需执行（schema.sql 已包含）。执行前请备份。
 -- 可重复执行：每一步先查 information_schema，已完成的步骤自动跳过。
 -- 用法：mysql -u<user> -p <库名> < upgrade-2026-11-25.sql
@@ -63,4 +63,37 @@ CREATE TABLE IF NOT EXISTS pb_budget_limit_log (
     limit_date  DATE           NOT NULL,
     created_at  DATETIME,
     UNIQUE KEY uk_budget_limit (plan_id, limit_date)
+);
+
+-- 8. pb_impression_log.billing_type / cpt_order_id（CPT 包词）
+SET @ddl = IF((SELECT COUNT(*) FROM information_schema.columns
+               WHERE table_schema = DATABASE() AND table_name = 'pb_impression_log' AND column_name = 'billing_type') = 0,
+    'ALTER TABLE pb_impression_log ADD COLUMN billing_type VARCHAR(8) NOT NULL DEFAULT ''CPC''', 'DO 0');
+PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @ddl = IF((SELECT COUNT(*) FROM information_schema.columns
+               WHERE table_schema = DATABASE() AND table_name = 'pb_impression_log' AND column_name = 'cpt_order_id') = 0,
+    'ALTER TABLE pb_impression_log ADD COLUMN cpt_order_id BIGINT NULL', 'DO 0');
+PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- 9. CPT 包词订单表
+CREATE TABLE IF NOT EXISTS pb_cpt_order (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_id     BIGINT         NOT NULL,
+    plan_id        BIGINT         NOT NULL,
+    unit_id        BIGINT         NOT NULL,
+    qa_id          BIGINT         NOT NULL,
+    keyword        VARCHAR(64)    NOT NULL,
+    keyword_norm   VARCHAR(64)    NOT NULL,
+    start_date     DATE           NOT NULL,
+    end_date       DATE           NOT NULL,
+    daily_price    DECIMAL(10, 2) NOT NULL,
+    total_price    DECIMAL(12, 2) NOT NULL,
+    refund_amount  DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    status         VARCHAR(16)    NOT NULL DEFAULT 'ACTIVE',
+    canceled_at    DATETIME,
+    created_at     DATETIME,
+    updated_at     DATETIME,
+    KEY idx_cpt_keyword (keyword_norm, start_date, end_date),
+    KEY idx_cpt_account (account_id)
 );

@@ -33,6 +33,9 @@ public class ImpressionLog {
     private BigDecimal chargePrice;
     private BigDecimal qualityScore;
     private String matchType;
+    /** CPC / CPT [C]。 */
+    private String billingType;
+    private Long cptOrderId;
     private Boolean clicked;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

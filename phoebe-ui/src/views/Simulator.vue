@@ -29,13 +29,24 @@
             <a class="t" @click="it.type === 'AD' ? click(it) : null">{{ it.title }}</a>
             <div class="snip">{{ it.snippet }}</div>
             <div class="src">
-              <template v-if="it.type === 'AD'">{{ it.advertiser }} · 企业回答 <span class="adtag">广告</span></template>
+              <template v-if="it.type === 'AD'">{{ it.advertiser }} · 企业回答 <span class="adtag">广告</span>
+                <el-tag v-if="it.billingType === 'CPT'" size="small" type="danger" effect="plain" style="margin-left:4px">CPT 包词</el-tag>
+                <el-tag v-else size="small" effect="plain" style="margin-left:4px">CPC</el-tag></template>
               <template v-else>网友回答 · 模拟自然结果</template>
             </div>
           </div>
         </div>
       </el-col>
       <el-col :span="13">
+        <div class="pb-panel" v-if="r.cpt">
+          <div class="pb-panel-title">CPT 包词命中 <span class="muted">同一个词 CPT 优先于 CPC，占第一个广告位；CPC 顺延填充其余广告位</span></div>
+          <el-descriptions :column="3" border size="small">
+            <el-descriptions-item label="包断词">{{ r.cpt.keyword }}</el-descriptions-item>
+            <el-descriptions-item label="广告主">{{ r.cpt.advertiser }}</el-descriptions-item>
+            <el-descriptions-item label="订单">#{{ r.cpt.orderId }} · {{ r.cpt.period }} · ¥{{ r.cpt.dailyPrice }}/天</el-descriptions-item>
+            <el-descriptions-item label="展示问答" :span="3">{{ r.cpt.question }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
         <div class="pb-panel">
           <div class="pb-panel-title">竞价明细 <span class="muted">得分 = 有效出价 × 质量度；计费 = 下一名得分 / 自身质量度 + 0.01</span></div>
           <el-table :data="r.auction" border>
@@ -66,6 +77,7 @@
     <el-dialog v-model="mpDlg" :title="'企业商业专属问答页 · ' + (clickRes?.middlePage?.name || '')" :width="clickRes?.middlePage?.device === 'MOBILE' ? 440 : 980" top="4vh">
       <div class="charge">
         <template v-if="clickRes?.duplicateClick">同一展现重复点击，不再计费</template>
+        <template v-else-if="clickRes?.billingType === 'CPT'">CPT 包词广告：已按天预付，本次点击不扣费。中间页内点击同样不计费。</template>
         <template v-else>问答入口点击计费 <b>¥{{ clickRes?.charged }}</b>（有效出价 ¥{{ clickRes?.bidPrice }}），广告主余额 ¥{{ clickRes?.balance }}。中间页内点击不计费。</template>
       </div>
       <PagePreview v-if="clickRes" :content="clickRes.middlePage.content" :device="clickRes.middlePage.device" :pc-style="clickRes.middlePage.pcStyle"

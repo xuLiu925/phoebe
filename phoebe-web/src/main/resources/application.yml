@@ -72,7 +72,14 @@ phoebe:
     base-ctr: 0.05
     search-list-position: 4
     question-page-position: 1
-    ad-slots: 1
+    ad-slots: 2
+  # CPT 包词（定价与期限规则为示例 [U]）
+  cpt:
+    base-daily-price: 100
+    price-per-thousand-pv: 1.0
+    min-daily-price: 50
+    max-daily-price: 3000
+    max-days: 90
 
 logging:
   level:

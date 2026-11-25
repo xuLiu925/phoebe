@@ -230,7 +230,9 @@ CREATE TABLE IF NOT EXISTS pb_impression_log (
     effective_bid   DECIMAL(8, 2) NOT NULL,
     charge_price    DECIMAL(8, 2) NOT NULL COMMENT '若被点击时的计费价（二价）',
     quality_score   DECIMAL(6, 3) NOT NULL,
-    match_type      VARCHAR(16)  NOT NULL COMMENT 'EXACT/PHRASE/SUBSCRIBE/SIMILAR',
+    match_type      VARCHAR(16)  NOT NULL COMMENT 'EXACT/PHRASE/SUBSCRIBE/SIMILAR/CPT',
+    billing_type    VARCHAR(8)   NOT NULL DEFAULT 'CPC' COMMENT 'CPC 竞价 / CPT 包词 [C]',
+    cpt_order_id    BIGINT       COMMENT 'CPT 展现对应的订单',
     clicked         TINYINT      NOT NULL DEFAULT 0,
     created_at      DATETIME,
     KEY idx_imp_request (request_id)
@@ -312,4 +314,26 @@ CREATE TABLE IF NOT EXISTS pb_budget_limit_log (
     limit_date  DATE           NOT NULL,
     created_at  DATETIME,
     UNIQUE KEY uk_budget_limit (plan_id, limit_date)
+);
+
+-- CPT 包词订单 [C]：同一个词 CPT 展示优先级高于 CPC；按天包词、预付、同词同日独占、CPT 点击不扣费
+CREATE TABLE IF NOT EXISTS pb_cpt_order (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_id     BIGINT         NOT NULL,
+    plan_id        BIGINT         NOT NULL,
+    unit_id        BIGINT         NOT NULL,
+    qa_id          BIGINT         NOT NULL COMMENT '包词期间展示的问答',
+    keyword        VARCHAR(64)    NOT NULL COMMENT '包断的词（展示用原文）',
+    keyword_norm   VARCHAR(64)    NOT NULL COMMENT '归一化后的词，用于独占冲突检查与匹配',
+    start_date     DATE           NOT NULL,
+    end_date       DATE           NOT NULL,
+    daily_price    DECIMAL(10, 2) NOT NULL COMMENT '日单价（定价规则 [U]）',
+    total_price    DECIMAL(12, 2) NOT NULL COMMENT '下单时一次性扣款',
+    refund_amount  DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    status         VARCHAR(16)    NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE/CANCELED；待开始/投放中/已结束由日期推导',
+    canceled_at    DATETIME,
+    created_at     DATETIME,
+    updated_at     DATETIME,
+    KEY idx_cpt_keyword (keyword_norm, start_date, end_date),
+    KEY idx_cpt_account (account_id)
 );

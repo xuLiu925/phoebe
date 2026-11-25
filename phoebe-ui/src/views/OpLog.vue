@@ -48,8 +48,8 @@
 import { onMounted, ref } from 'vue'
 import http from '../api'
 
-const TYPES = { PLAN: '推广计划', UNIT: '推广单元', QA: '知识问答', CREATIVE: '高级创意', MIDDLE_PAGE: '中间页', KNOWLEDGE: '企业知识', IMAGE: '图片', AUDIT: '审核', ACCOUNT: '账户' }
-const ACTIONS = { CREATE: '新建', UPDATE: '修改', DELETE: '删除', ENABLE: '启用', PAUSE: '暂停', UPDATE_CONTENT: '修改内容', UPDATE_BID: '修改出价', SAVE_DRAFT: '保存', SUBMIT: '提交审核', IMPORT: '导入', COPY_PC_TO_MOBILE: '导入PC内容', EXCEL_IMPORT: '批量上传', SUBSCRIBE_WORDS: '修改订阅词', APPROVE: '审核通过', REJECT: '审核拒绝', RECHARGE: '充值', DISABLE: '停用', BIND_QA: '关联问答' }
+const TYPES = { PLAN: '推广计划', UNIT: '推广单元', QA: '知识问答', CREATIVE: '高级创意', MIDDLE_PAGE: '中间页', KNOWLEDGE: '企业知识', IMAGE: '图片', AUDIT: '审核', ACCOUNT: '账户', CPT: 'CPT 包词' }
+const ACTIONS = { CREATE: '新建', UPDATE: '修改', DELETE: '删除', ENABLE: '启用', PAUSE: '暂停', UPDATE_CONTENT: '修改内容', UPDATE_BID: '修改出价', SAVE_DRAFT: '保存', SUBMIT: '提交审核', IMPORT: '导入', COPY_PC_TO_MOBILE: '导入PC内容', EXCEL_IMPORT: '批量上传', SUBSCRIBE_WORDS: '修改订阅词', APPROVE: '审核通过', REJECT: '审核拒绝', RECHARGE: '充值', DISABLE: '停用', BIND_QA: '关联问答', CANCEL: '取消', REFUND: '退款', CHARGE: '扣款' }
 const range = ref(null)
 const ttype = ref(null)
 const logs = ref([])
