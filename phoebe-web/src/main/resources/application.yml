@@ -1,0 +1,79 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: phoebe-rebuild
+  profiles:
+    # 默认 h2：零依赖内存库，每次启动重新建表并灌入演示数据。
+    # 使用 MySQL：--spring.profiles.active=mysql（见 application-mysql.yml）
+    active: h2
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    serialization:
+      write-dates-as-timestamps: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+      encoding: UTF-8
+      continue-on-error: false
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+phoebe:
+  jwt:
+    # 演示用密钥，部署时务必通过环境变量 PHOEBE_JWT_SECRET 覆盖
+    secret: ${PHOEBE_JWT_SECRET:phoebe-rebuild-demo-secret-please-change-0123456789}
+    expire-hours: 12
+  upload-dir: ./data/uploads
+  # 首次启动若日报为空，自动生成最近 7 天演示统计
+  seed-demo-stats: true
+  audit:
+    auto-approve: false
+  # 业务规则（来源与证据等级见 PhoebeRules.java 与 docs/03-差异与不确定性清单.md）
+  rules:
+    max-plans-per-account: 100
+    max-units-per-plan: 100
+    max-qas-per-unit: 100
+    max-middle-pages-per-plan: 2
+    max-enabled-middle-pages-per-plan: 1
+    question-min-chars: 10
+    question-max-chars: 98
+    answer-min-chars: 160
+    answer-max-chars: 19998
+    excel-max-rows: 100
+  simulator:
+    min-price: 0.30
+    base-ctr: 0.05
+    search-list-position: 4
+    question-page-position: 1
+    ad-slots: 1
+
+logging:
+  level:
+    com.rebuild.phoebe: info

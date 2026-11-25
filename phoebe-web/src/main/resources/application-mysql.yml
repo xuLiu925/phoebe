@@ -1,0 +1,8 @@
+# 使用前先建库：CREATE DATABASE phoebe DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;
+# 建表与演示数据脚本可重复执行（CREATE TABLE IF NOT EXISTS / INSERT IGNORE），启动时自动执行。
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:phoebe}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}

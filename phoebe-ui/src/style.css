@@ -1,0 +1,76 @@
+/*
+ * 视觉参考：百度营销公开的《知识营销CPC业务端使用说明（2018）》截图——
+ * 白色顶栏 + 顶部一级导航、浅灰内容底、白色面板、蓝色主按钮、高密度表格、状态用彩色文字。
+ * 仅参考布局与配色风格，未使用任何百度标识。
+ */
+:root {
+  --el-color-primary: #3385ff;
+  --el-color-primary-light-3: #70a9ff;
+  --el-color-primary-light-5: #99c2ff;
+  --el-color-primary-light-7: #c2daff;
+  --el-color-primary-light-8: #d6e6ff;
+  --el-color-primary-light-9: #ebf3ff;
+  --el-color-primary-dark-2: #2a6ad6;
+  --el-border-radius-base: 2px;
+  --el-border-radius-small: 2px;
+  --el-font-size-base: 13px;
+  --el-text-color-primary: #333;
+  --el-text-color-regular: #555;
+  --el-border-color: #dcdfe6;
+  --el-border-color-lighter: #ebeef5;
+  --pb-bg: #f2f3f5;
+  --pb-green: #2bb24c;
+  --pb-orange: #ff9900;
+  --pb-red: #f2463d;
+  --pb-gray: #999;
+}
+html, body, #app { margin: 0; height: 100%; font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif; background: var(--pb-bg); color: #333; font-size: 13px; }
+a { color: #3385ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* 页面骨架 */
+.pb-page { padding: 16px 20px 40px; }
+.pb-panel { background: #fff; border: 1px solid #e6e8eb; padding: 16px 20px; margin-bottom: 12px; }
+.pb-panel-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: #333; }
+.pb-crumb { font-size: 14px; margin-bottom: 12px; }
+.pb-crumb a { margin-right: 4px; }
+.pb-crumb b { margin-left: 4px; }
+
+/* 工具条：左侧操作，右侧搜索 */
+.pb-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.pb-toolbar .spacer { flex: 1; }
+
+/* 状态文字 */
+.st { white-space: nowrap; }
+.st-green { color: var(--pb-green); }
+.st-orange { color: var(--pb-orange); }
+.st-red { color: var(--pb-red); }
+.st-gray { color: var(--pb-gray); }
+.st-blue { color: #3385ff; }
+
+.muted { color: #999; font-size: 12px; }
+.hint { color: #999; font-size: 12px; margin-left: 10px; }
+.req::before { content: "*"; color: var(--pb-red); margin-right: 4px; }
+
+/* 表格：高密度、浅表头 */
+.el-table { --el-table-header-bg-color: #f7f8fa; --el-table-header-text-color: #666; font-size: 12px; }
+.el-table th.el-table__cell { font-weight: normal; }
+.el-table .cell { line-height: 20px; }
+.edit-icon { color: #b0b6bf; cursor: pointer; margin-left: 4px; vertical-align: -2px; }
+.edit-icon:hover { color: #3385ff; }
+
+/* 全页表单：标签右对齐 + 右侧灰色提示 */
+.pb-form .el-form-item { margin-bottom: 22px; }
+.pb-form .el-form-item__label { color: #666; }
+.pb-form-actions { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #e6e8eb; padding: 12px 20px; display: flex; gap: 10px; align-items: center; z-index: 10; }
+
+.evidence { display: inline-block; font-size: 11px; padding: 0 5px; line-height: 16px; border-radius: 2px; background: #ebf3ff; color: #3385ff; margin-left: 6px; vertical-align: 1px; }
+.evidence.inferred { background: #fff5e6; color: #ff9900; }
+.answer-html p { margin: 4px 0; }
+.el-tabs__item { font-size: 13px; }
+
+/* 旧版页面（审核台/系统管理/资源管理/关于）直接放在 pb-page 下的内容也套上白色面板 */
+.pb-page > .el-tabs, .pb-page > .pb-toolbar + .el-table, .pb-page > .el-table { background: #fff; border: 1px solid #e6e8eb; padding: 12px 16px; box-sizing: border-box; }
+.pb-page > .pb-toolbar { background: #fff; border: 1px solid #e6e8eb; border-bottom: none; padding: 12px 16px; margin-bottom: 0; }
+.pb-page > h3, .pb-page > h4 { margin: 18px 0 8px; }
+.el-date-editor.el-range-editor { width: 250px !important; flex: none !important; }

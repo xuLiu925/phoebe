@@ -1,0 +1,9 @@
+target/
+node_modules/
+data/
+*.log
+.idea/
+*.iml
+.vscode/
+.claude/
+.tmp-mysql/
